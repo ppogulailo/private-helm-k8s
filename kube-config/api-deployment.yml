@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: short-api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      components: backend
+  template: # same as in pods metadata,
+    metadata:
+      name: short-api
+      labels:
+        components: backend
+    spec:
+      containers:
+        - name: short-api
+          image: antonlarichev/short-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              memory: '500Mi'
+              cpu: '200m'
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: DATABASE_URI
+                  name: api-secret
+          volumeMounts:
+            - mountPath: /etc/test
+              name: test
+              readOnly: true
+          livenessProbe: # Health check of http://localhost:3000/api not health will restart api
+            exec:
+              command:
+                - curl
+                - --fail
+                - http://localhost:3000/api
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 1
+      volumes:
+        - name: test
+          configMap:
+            name: demo-config
+
+# DATABASE_URI
+# postgresql://user:password@url:5432/postgres

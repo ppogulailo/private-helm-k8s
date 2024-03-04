@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: short-app-deployment
+  namespace: my-name-space
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      components: frontend
+  template: # same as in pods metadata,
+    metadata:
+      name: short-app
+      labels:
+        components: frontend
+    spec:
+      containers:
+        - name: short-app
+          image: antonlarichev/short-app:v1.4
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: '500Mi'
+              cpu: '300m'

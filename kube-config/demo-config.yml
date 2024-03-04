@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-config
+data:
+  key: "dsasa"
+#   For configuring file as postgres, ( nignx for me good example )
