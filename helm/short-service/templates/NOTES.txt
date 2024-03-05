@@ -1,0 +1,1 @@
+You succesfully install application {{.Release.Name}} {{.Chart.Version}}

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: short-app-deployment
-  namespace: my-name-space
+#  namespace: my-name-space
 spec:
   replicas: 1
   selector:

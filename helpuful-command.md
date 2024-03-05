@@ -43,7 +43,11 @@ generic | tlc | docker-registry,
 Namespaces can be shared only with namespaces
 
 
+# HELM 
+`helm install --debug --dry-run short-service-realise helm/short-service`
 
-
+`helm package short-service/`
+`helm install short-service-release ./short-service/`
+`helm uninstall short-service-release`
 
 ![img.png](img.png)

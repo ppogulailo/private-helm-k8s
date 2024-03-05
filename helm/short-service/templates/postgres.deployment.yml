@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.postgres.name}}-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      components: {{.Values.postgres.components}}
+  template: # same as in pods metadata,
+    metadata:
+      labels:
+        components: {{.Values.postgres.components}}
+    spec:
+      containers:
+        - name: {{.Values.postgres.name}}
+          image: "{{.Values.postgres.image}}:{{.Values.postgres.version}}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5432
+          env:
+            {{- range .Values.postgres.envs }}
+            {{- $data := dict "name" $.Values.postgres.name "env" .}} # .$ global scope
+            {{- include "env.template" $data | indent 12}}
+            {{- end}}
+          resources:
+            limits:
+              memory: '500Mi'
+              cpu: '300m'
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              subPath: {{.Values.postgres.name}}
+              name: {{.Values.postgres.name}}-data
+      volumes:
+        - name: {{.Values.postgres.name}}-data
+          persistentVolumeClaim:
+            claimName: {{.Values.postgres.name}}-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-clusterip
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      protocol: TCP
+  selector:
+    components: postgres

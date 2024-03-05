@@ -1,0 +1,28 @@
+# For get access to app from ClusterIp, because clusterIp only enabled inside k8s
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myingress
+  annotations:
+    nginx.ingress.kubernetes.io/add-base-url: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: kubectl.test
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{.Values.app.name}}-clusterip
+                port:
+                  number:  {{.Values.app.port}}
+            pathType: Prefix
+            path: "/"
+          - pathType: Prefix
+            path: '/api'
+            backend:
+              service:
+                name: {{.Values.app.name}}-clusterip
+                port:
+                  number: 3000
